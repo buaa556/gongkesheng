@@ -167,7 +167,7 @@ class wechatCallbackapiTest
             //你的邮箱账号(去掉@163.com)
             $smtpuser = "mengdechaolive";//SMTP服务器的用户帐号 
             //你的邮箱密码
-            $smtppass = "mdc86387968"; //SMTP服务器的用户密码 
+            $smtppass = ""; //SMTP服务器的用户密码 
             //邮件主题 
             $mailsubject = date("m-d")."意见反馈";
             //邮件内容 
