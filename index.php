@@ -4,7 +4,13 @@
     CopyRight 2014 All Rights Reserved
 */
 
-define("TOKEN", "");
+define("TOKEN", "weixin");
+
+require __DIR__.'/vendor/autoload.php';
+
+use NumPHP\Core\NumArray;
+use NumPHP\LinAlg\LinAlg;
+
 
 $wechatObj = new wechatCallbackapiTest();
 if (!isset($_GET['echostr'])) {
@@ -101,6 +107,44 @@ class wechatCallbackapiTest
 			$result = $this->transmitText($object, "回复天气+城市名（如“天气北京”）查看本地天气预报\n回复翻译+词汇（如“翻译你好”）查看中译英\n回复英文单词（如“hello”）查看英译中（注：若有标点，请在前加翻译二字。）\n回复“关于平台”查看本平台详细信息\n回复“新闻”查看新闻\n回复菜名，如“鱼香肉丝”查看菜谱\n普通回复，将会召唤出图灵机器人与您聊天。\n回复邮件+内容（如“邮件主页君你好帅”）为主页君发送邮件，最好在邮件内容中附上你的邮箱方便主页君尽快联系您。");
 			return $result;
 		}
+        if($str_key == '计算'){
+			if(strstr($keyword,"[")){
+                $input = explode("#",$keyword);
+                if(sizeof($input) == 2){
+                    eval('$array1 = '.$input[0].';');
+                    $matrix1 = new NumArray($array1);
+                    if(trim($input[1]) == "inv")
+                            $matrix1 = LinAlg::inv($matrix1);
+                    if(trim($input[1]) == "det")
+                            $matrix1 = LinAlg::det($matrix1);
+                }
+                elseif(sizeof($input) == 3)
+                {
+               
+                        eval('$array1 = '.$input[0].';');
+                        eval('$array2 = '.$input[2].';');
+                        $matrix1 = new NumArray($array1);
+                        $matrix2 = new NumArray($array2);
+                        if(trim($input[1]) == "+")
+                            $matrix1->add($matrix2);
+                        if(trim($input[1]) == "-")
+                            $matrix1->sub($matrix2);
+                        if(trim($input[1]) == "*")
+                            $matrix1->dot($matrix2);
+
+                    
+                }
+            }
+            else
+                    eval('$matrix1 = '.$keyword.';');
+			$output = (string)$matrix1;
+			if($matrix1 == 0)
+				$output == "0.000000000001";
+            $result = $this->transmitText($object,$output);
+                    
+           
+			return $result;
+		}
 		if($str_key == "天气"){
 			$url = "http://apix.sinaapp.com/weather/?appkey=".$object->ToUserName."&city=".urlencode($keyword); 
 			$output = file_get_contents($url);
@@ -117,13 +161,13 @@ class wechatCallbackapiTest
             //163邮箱服务器端口 
             $smtpserverport = 25;
             //你的163服务器邮箱账号
-            $smtpusermail = "@163.com";
+            $smtpusermail = "mengdechaolive@163.com";
             //收件人邮箱
-            $smtpemailto = "";
+            $smtpemailto = "mengdechaolive@qq.com";
             //你的邮箱账号(去掉@163.com)
-            $smtpuser = "";//SMTP服务器的用户帐号 
+            $smtpuser = "mengdechaolive";//SMTP服务器的用户帐号 
             //你的邮箱密码
-            $smtppass = ""; //SMTP服务器的用户密码 
+            $smtppass = "mdc86387968"; //SMTP服务器的用户密码 
             //邮件主题 
             $mailsubject = date("m-d")."意见反馈";
             //邮件内容 
@@ -131,6 +175,7 @@ class wechatCallbackapiTest
             //邮件格式（HTML/TXT）,TXT为文本邮件 
             $mailtype = "TXT";
             //这里面的一个true是表示使用身份验证,否则不使用身份验证. 
+            
             $smtp = new smtp($smtpserver,$smtpserverport,true,$smtpuser,$smtppass);
             //是否显示发送的调试信息 
             $smtp->debug = TRUE;
@@ -318,6 +363,7 @@ class wechatCallbackapiTest
         if(!function_exists('file_get_contents')){
 
             $file_contents = file_get_contents($url);
+           
 
         }else{
                 
